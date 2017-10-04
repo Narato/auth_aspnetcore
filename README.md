@@ -4,6 +4,13 @@ Fork of the [Digipolis Auth Toolbox](https://github.com/digipolisantwerp/auth_as
 
 Adds authentication based on an internal API key passed in the request headers.
 
+## Installation
+```
+  <ItemGroup>
+    <PackageReference Include="Narato.Digipolis.Auth" Version="1.0.0" />
+  </ItemGroup>
+```
+ 
 ## Configuration
 Some additional configuration options are available:
 
