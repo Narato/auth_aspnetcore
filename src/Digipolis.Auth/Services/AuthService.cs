@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Digipolis.Auth.Options;
 
 namespace Digipolis.Auth.Services
 {
@@ -40,6 +41,14 @@ namespace Digipolis.Auth.Services
             get
             {
                 return _httpContextAccessor.HttpContext.Session.GetString("auth-jwt");
+            }
+        }
+
+        public bool IsInternalApiRequest
+        {
+            get
+            {
+                return _httpContextAccessor.HttpContext.User.HasClaim(c => c.Type == InternalApikeyHeaderAuthenticationOptions.CLAIM_TYPE);
             }
         }
 

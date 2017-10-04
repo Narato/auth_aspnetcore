@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Digipolis.Auth.Jwt;
 using Digipolis.Auth.Options;
 using Digipolis.Auth.PDP;
+using Digipolis.Auth.Middleware;
 
 namespace Digipolis.Auth
 {
@@ -25,6 +26,11 @@ namespace Digipolis.Auth
             var authOptions = app.ApplicationServices.GetService<IOptions<AuthOptions>>().Value;
             var tokenRefreshHandler = app.ApplicationServices.GetService<ITokenRefreshHandler>();
             var jwtBearerOptionsFactory = app.ApplicationServices.GetService<JwtBearerOptionsFactory>();
+
+            if (authOptions.EnableInternalApikeyHeaderAuth)
+            {
+                app.UseInternalKeyHeaderAuth();
+            }
 
             var jwtBearerOptions = jwtBearerOptionsFactory.Create();
             jwtBearerOptions.AuthenticationScheme = AuthSchemes.JwtHeaderAuth;
@@ -105,6 +111,11 @@ namespace Digipolis.Auth
             });
 
             return app;
+        }
+
+        public static IApplicationBuilder UseInternalKeyHeaderAuth(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<InternalApikeyHeaderAuthenticationMiddleware>();
         }
 
         private static bool IsAjaxRequest(HttpRequest request)

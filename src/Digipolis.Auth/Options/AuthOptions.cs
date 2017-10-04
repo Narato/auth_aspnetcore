@@ -24,6 +24,16 @@
         public bool EnableJwtHeaderAuth { get; set; } = true;
 
         /// <summary>
+        /// Set to true to enable the apikey in header authentication handling. Default = false.
+        /// </summary>
+        public bool EnableInternalApikeyHeaderAuth { get; set; } = false;
+
+        /// <summary>
+        /// Expected value of the internal apikey header to use for authentication
+        /// </summary>
+        public string InternalApikey { get; set; }
+
+        /// <summary>
         /// The url to the PDP endpoint.
         /// </summary>
         public string PdpUrl { get; set; }
