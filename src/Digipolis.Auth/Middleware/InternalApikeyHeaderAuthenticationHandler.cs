@@ -17,7 +17,8 @@ namespace Digipolis.Auth.Middleware
                 if (Context.Request.Headers[InternalApikeyHeaderAuthenticationOptions.HEADER_NAME] == Options.HeaderValue)
                 {
                     var claims = new ClaimsIdentity(new Claim[] {
-                        new Claim(InternalApikeyHeaderAuthenticationOptions.CLAIM_TYPE, Options.HeaderValue)
+                        new Claim(InternalApikeyHeaderAuthenticationOptions.CLAIM_TYPE, Options.HeaderValue),
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, "internal-api")
                     }, Options.AuthenticationScheme);
                     
                     var claimsPrincipal = new ClaimsPrincipal(claims);
