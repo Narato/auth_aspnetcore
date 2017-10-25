@@ -37,8 +37,15 @@ namespace Digipolis.Auth
 
             if (authOptions.EnableJwtHeaderAuth)
             {
-                //Add middleware that handles jwt tokens present in Authentication Header
+                // Add middleware that handles jwt tokens present in Authentication Header
                 app.UseJwtBearerAuthentication(jwtBearerOptions);
+            }
+
+            if (authOptions.EnableAProfielAuth)
+            {
+                // IMPORTANT: temporary workaround to enable authentication for A-Profiel
+                // This must be replaced with an OAuth validation which checks the AProfiel access token
+                app.UseAProfielAuth();
             }
 
             if (authOptions.EnableCookieAuth)
@@ -116,6 +123,10 @@ namespace Digipolis.Auth
         public static IApplicationBuilder UseInternalKeyHeaderAuth(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<InternalApikeyHeaderAuthenticationMiddleware>();
+        }
+        public static IApplicationBuilder UseAProfielAuth(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<AProfielAuthenticationMiddleware>();
         }
 
         private static bool IsAjaxRequest(HttpRequest request)

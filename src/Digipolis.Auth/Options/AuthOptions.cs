@@ -29,6 +29,11 @@
         public bool EnableInternalApikeyHeaderAuth { get; set; } = false;
 
         /// <summary>
+        /// Set to true to enable the AProfiel token authentication. Default = false.
+        /// </summary>
+        public bool EnableAProfielAuth { get; set; } = false;
+
+        /// <summary>
         /// Expected value of the internal apikey header to use for authentication
         /// </summary>
         public string InternalApikey { get; set; }
