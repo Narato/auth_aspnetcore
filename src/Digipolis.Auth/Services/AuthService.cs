@@ -1,5 +1,6 @@
 ﻿using Digipolis.Auth.Jwt;
 using Digipolis.Auth.Options;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -15,21 +16,26 @@ namespace Digipolis.Auth.Services
         private IHttpContextAccessor _httpContextAccessor;
         private readonly ITokenRefreshAgent _tokenRefreshAgent;
         private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly IAuthenticationService _authenticationService;
         private readonly AuthOptions _authOptions;
 
         public AuthService(IHttpContextAccessor httpContextAccessor,
             ITokenRefreshAgent tokenRefreshAgent,
             IUrlHelperFactory urlHelperFactory,
-            IOptions<AuthOptions> options)
+            IOptions<AuthOptions> options,
+            IAuthenticationService authenticationService)
         {
             if (httpContextAccessor == null) throw new ArgumentNullException($"{nameof(httpContextAccessor)} cannot be null.");
             if (tokenRefreshAgent == null) throw new ArgumentNullException($"{nameof(tokenRefreshAgent)} cannot be null.");
             if (urlHelperFactory == null) throw new ArgumentNullException($"{nameof(urlHelperFactory)} cannot be null.");
+            if (options == null) throw new ArgumentNullException(nameof(options), $"{nameof(options)} cannot be null");
+            if (authenticationService == null) throw new ArgumentNullException(nameof(authenticationService), $"{nameof(authenticationService)} cannot be null");
 
             _httpContextAccessor = httpContextAccessor;
             _tokenRefreshAgent = tokenRefreshAgent;
             _urlHelperFactory = urlHelperFactory;
             _authOptions = options.Value;
+            _authenticationService = authenticationService;
         }
 
         public ClaimsPrincipal User
@@ -40,6 +46,14 @@ namespace Digipolis.Auth.Services
             }
         }
 
+        public bool IsInternalApiRequest
+        {
+            get
+            {
+                return _httpContextAccessor.HttpContext.User.HasClaim(c => c.Type == InternalApikeyHeaderAuthenticationOptions.CLAIM_TYPE);
+            }
+        }
+        
         public string UserToken
         {
             get
@@ -57,8 +71,8 @@ namespace Digipolis.Auth.Services
         }
 
         public async Task<string> LogOutAsync(ControllerContext controllerContext, string redirectController, string redirectAction)
-        { 
-            await _httpContextAccessor.HttpContext.Authentication.SignOutAsync(AuthSchemes.CookieAuth);
+        {
+            await _authenticationService.SignOutAsync(_httpContextAccessor.HttpContext, AuthSchemes.CookieAuth, new AuthenticationProperties());
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(controllerContext);
             var returnUrl = urlHelper.Action(redirectAction, redirectController, null, _httpContextAccessor.HttpContext.Request.Scheme);

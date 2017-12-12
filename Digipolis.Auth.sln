@@ -1,12 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9B2BBF4-ADEE-03F9-FAD8-D9E71044D12B}"
 	ProjectSection(SolutionItems) = preProject
-		changelog.md = changelog.md
+		CHANGELOG.md = CHANGELOG.md
 		nuget.config = nuget.config
-		readme.md = readme.md
+		README.md = README.md
 	EndProjectSection
 	ProjectSection(FolderGlobals) = preProject
 		global_1json__JSONSchema = http://json.schemastore.org/global
@@ -57,5 +57,8 @@ Global
 		{30E05B9D-9E1E-45D5-BBCB-FA3154C3889C} = {E1A61BD2-F970-47DD-8645-F75CBDB0CDE6}
 		{A66BF273-CD32-1A2F-52A6-EE88C52C0287} = {A6F367F5-D734-CCF1-30C2-37BEF50E2F59}
 		{364116A0-87AD-A08F-3CC5-26D22AF43786} = {F1A919A4-1EF4-0BE6-0958-1716F206A8ED}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DBE48342-6DCF-4B50-A6F5-7013323FB791}
 	EndGlobalSection
 EndGlobal

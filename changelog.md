@@ -1,5 +1,12 @@
 # Auth Toolbox
 
+## 3.0.1-beta1
+- Refactored InternalApiKey authentication to .net core 2.0
+- Refcatored A profiel authentication to .net core 2.0
+
+## 3.0.0-beta1
+- Upgrade to ASP.NET Core 2.0
+
 ## 2.5.0
 - Added header jwt token read with option JwtTokenSource in AuthService.
 

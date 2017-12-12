@@ -10,6 +10,8 @@
     {
         public const string CookieAuth = "CookieAuth";
         public const string JwtHeaderAuth = "JwtHeaderAuth";
+        public const string InternalAPIAuth = "InternalApiAuthentication";
+        public const string AProfiel = "AProfielAuthentication";
     }
 
     internal static class HttpMethods

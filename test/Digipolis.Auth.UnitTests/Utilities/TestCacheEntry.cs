@@ -25,6 +25,12 @@ namespace Digipolis.Auth.UnitTests.Utilities
 
         public object Value { get; set; }
 
+        public long? Size
+        {
+            get => 0;
+            set { }
+        }
+
         public void Dispose()
         {
         }

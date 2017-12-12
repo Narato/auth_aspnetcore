@@ -7,6 +7,7 @@ using Digipolis.Auth.PDP;
 using Digipolis.Auth.Services;
 using Digipolis.Auth.Utilities;
 using Digipolis.DataProtection.Postgres;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -49,9 +50,9 @@ namespace Digipolis.Auth
         /// <param name="setupDevPermissions">A setup action to customize the DevPermissionsOptions options.</param>
         /// <param name="policies"></param>
         /// <returns></returns>
-        public static IServiceCollection AddAuth(this IServiceCollection services, 
-            Action<AuthOptions> setupAuthOptions, 
-            Action<DevPermissionsOptions> setupDevPermissions, 
+        public static IServiceCollection AddAuth(this IServiceCollection services,
+            Action<AuthOptions> setupAuthOptions,
+            Action<DevPermissionsOptions> setupDevPermissions,
             Dictionary<string, AuthorizationPolicy> policies = null)
         {
             if (setupAuthOptions == null) throw new ArgumentNullException(nameof(setupAuthOptions), $"{nameof(setupAuthOptions)} cannot be null.");
@@ -77,8 +78,6 @@ namespace Digipolis.Auth
             var options = new AuthOptionsJsonFile();
             setupAction.Invoke(options);
 
-            //var basePath = Environment.GetEnvironmentVariable("ASPNETCORE_CONTENTROOT");
-
             var builder = new ConfigurationBuilder().SetBasePath(options.BasePath)
                                                     .AddJsonFile(options.FileName);
             var config = builder.Build();
@@ -97,7 +96,6 @@ namespace Digipolis.Auth
 
             var authOptions = BuildOptions<AuthOptions>(serviceProvider, services);
             var devPermissionsOptions = BuildOptions<DevPermissionsOptions>(serviceProvider, services);
-
             var applicationContext = GetApplicationContext(serviceProvider);
 
             if (authOptions.EnableCookieAuth && authOptions.UseDotnetKeystore)
@@ -105,14 +103,47 @@ namespace Digipolis.Auth
                 services.AddDataProtection().PersistKeysToPostgres(authOptions.DotnetKeystore, Guid.Parse(applicationContext.ApplicationId), Guid.Parse(applicationContext.InstanceId));
             }
 
-            AddAuthorization(services, policies, authOptions);
             RegisterServices(services, devPermissionsOptions);
+            AddAuthorization(services, policies, authOptions);
 
             return services;
         }
 
         private static void AddAuthorization(IServiceCollection services, Dictionary<string, AuthorizationPolicy> policies, AuthOptions authOptions)
         {
+            //Set default scheme
+            var authenticationBuilder = services.AddAuthentication(AuthSchemes.InternalAPIAuth);
+            
+            if (authOptions.EnableInternalApikeyHeaderAuth)
+            {
+                authenticationBuilder.AddInternalAPIKeyHeaderAuthentication(options => { });
+            }
+            
+            if (authOptions.EnableAProfielAuth)
+            {
+                // IMPORTANT: temporary workaround to enable authentication for A-Profiel
+                // This must be replaced with an OAuth validation which checks the AProfiel access token
+                authenticationBuilder.AddAProfielAuthentication(options => { });
+            }
+            
+            if (authOptions.EnableCookieAuth)
+            {
+                var cookieOptionsFactory = services.BuildServiceProvider().GetService<CookieOptionsFactory>();
+                authenticationBuilder.AddCookie(AuthSchemes.CookieAuth, options =>
+                    {
+                        cookieOptionsFactory.Setup(options);
+                    });
+            }
+
+            if (authOptions.EnableJwtHeaderAuth)
+            {
+                var jwtBearerOptionsFactory = services.BuildServiceProvider().GetService<JwtBearerOptionsFactory>();
+                authenticationBuilder.AddJwtBearer(AuthSchemes.JwtHeaderAuth, options =>
+                {
+                    jwtBearerOptionsFactory.Setup(options);
+                });
+            }
+
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap = new Dictionary<string, string>();
 
             services.AddAuthorization(options =>
@@ -142,6 +173,8 @@ namespace Digipolis.Auth
 
         private static void RegisterServices(IServiceCollection services, DevPermissionsOptions devPermissionsOptions)
         {
+            services.AddMemoryCache();
+            
             services.AddSingleton<IAuthorizationHandler, ConventionBasedAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, CustomBasedAuthorizationHandler>();
             services.AddSingleton<IRequiredPermissionsResolver, RequiredPermissionsResolver>();
@@ -150,13 +183,17 @@ namespace Digipolis.Auth
             services.AddSingleton<ISecurityTokenValidator, JwtSecurityTokenHandler>();
             services.AddSingleton<ITokenRefreshAgent, TokenRefreshAgent>();
             services.AddSingleton<ITokenRefreshHandler, TokenRefreshHandler>();
-            services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<ITokenValidationParametersFactory, TokenValidationParametersFactory>();
             services.AddSingleton<JwtBearerOptionsFactory>();
+            services.AddSingleton<CookieOptionsFactory>();
+            services.AddSingleton<IClaimsTransformation, PermissionsClaimsTransformer>();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAddSingleton<HttpMessageHandler, HttpClientHandler>();
+
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, AuthActionsOptionsSetup>());
+
+            services.AddScoped<IAuthService, AuthService>();
 
             if (EnvironmentHelper.IsDevelopmentOrRequiredEnvironment(services, devPermissionsOptions.Environment) && devPermissionsOptions.UseDevPermissions)
             {
