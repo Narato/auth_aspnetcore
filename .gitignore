@@ -201,3 +201,5 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 samples/SampleApp/wwwroot/lib/
+
+*.idea/
