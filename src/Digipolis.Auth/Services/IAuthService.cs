@@ -10,5 +10,6 @@ namespace Digipolis.Auth.Services
         ClaimsPrincipal User { get; }
         string UserToken { get; }
         Task<string> LogOutAsync(ControllerContext controllerContext, string redirectController, string redirectAction);
+        bool IsInternalApiRequest { get; }
     }
 }

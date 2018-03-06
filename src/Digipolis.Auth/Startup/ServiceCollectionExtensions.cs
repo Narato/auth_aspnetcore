@@ -111,10 +111,21 @@ namespace Digipolis.Auth
 
         private static void AddAuthorization(IServiceCollection services, Dictionary<string, AuthorizationPolicy> policies, AuthOptions authOptions)
         {
-            var authenticationBuilder = services.AddAuthentication(options =>
+            //Set default scheme
+            //var authenticationBuilder = services.AddAuthentication(options => { options.DefaultChallengeScheme = AuthSchemes.CookieAuth; });
+            var authenticationBuilder = services.AddAuthentication(AuthSchemes.InternalAPIAuth);
+            
+            if (authOptions.EnableInternalApikeyHeaderAuth)
             {
-                options.DefaultChallengeScheme = AuthSchemes.CookieAuth;
-            });
+                authenticationBuilder.AddInternalAPIKeyHeaderAuthentication(options => { });
+            }
+            
+            if (authOptions.EnableAProfielAuth)
+            {
+                // IMPORTANT: temporary workaround to enable authentication for A-Profiel
+                // This must be replaced with an OAuth validation which checks the AProfiel access token
+                authenticationBuilder.AddAProfielAuthentication(options => { });
+            }
 
             if (authOptions.EnableCookieAuth)
             {
