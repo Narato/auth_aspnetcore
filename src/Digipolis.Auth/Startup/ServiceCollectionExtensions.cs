@@ -119,13 +119,6 @@ namespace Digipolis.Auth
             {
                 authenticationBuilder.AddInternalAPIKeyHeaderAuthentication(options => { });
             }
-            
-            if (authOptions.EnableAProfielAuth)
-            {
-                // IMPORTANT: temporary workaround to enable authentication for A-Profiel
-                // This must be replaced with an OAuth validation which checks the AProfiel access token
-                authenticationBuilder.AddAProfielAuthentication(options => { });
-            }
 
             if (authOptions.EnableCookieAuth)
             {

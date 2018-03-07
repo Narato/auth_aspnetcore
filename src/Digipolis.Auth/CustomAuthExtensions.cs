@@ -12,10 +12,5 @@ namespace Digipolis.Auth
         {
             return builder.AddScheme<InternalApikeyHeaderAuthenticationOptions, InternalApikeyHeaderAuthenticationHandler>(AuthSchemes.InternalAPIAuth, "Internal api Auth", configureOptions);
         }
-        
-        public static AuthenticationBuilder AddAProfielAuthentication(this AuthenticationBuilder builder, Action<AProfielAuthenticationOptions> configureOptions)
-        {
-            return builder.AddScheme<AProfielAuthenticationOptions, AProfielAuthenticationHandler>(AuthSchemes.AProfiel, "A Profiel", configureOptions);
-        }
     }
 }

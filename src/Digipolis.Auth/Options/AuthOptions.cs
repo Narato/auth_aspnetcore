@@ -161,11 +161,6 @@
         /// Set to true to enable the apikey in header authentication handling. Default = false.
         /// </summary>
         public bool EnableInternalApikeyHeaderAuth { get; set; }
-        
-        /// <summary>
-        /// Set to true to enable the AProfiel token authentication. Default = false.
-        /// </summary>
-        public bool EnableAProfielAuth { get; set; } = false;
 
     }
 }
