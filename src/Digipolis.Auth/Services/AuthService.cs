@@ -45,6 +45,14 @@ namespace Digipolis.Auth.Services
                 return _httpContextAccessor.HttpContext.User;
             }
         }
+        
+        public bool IsInternalApiRequest
+        {
+            get
+            {
+                return _httpContextAccessor.HttpContext.User.HasClaim(c => c.Type == InternalApikeyHeaderAuthenticationOptions.CLAIM_TYPE);
+            }
+        }
 
         public string UserToken
         {

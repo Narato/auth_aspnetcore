@@ -156,6 +156,11 @@
         /// When enabled the permissions of the consumer application will be used when no user is authenticated.
         /// </summary>
         public bool EnableServiceAccountAuthorization { get; set; } = false;
+        
+        /// <summary>
+        /// Set to true to enable the apikey in header authentication handling. Default = false.
+        /// </summary>
+        public bool EnableInternalApikeyHeaderAuth { get; set; }
 
     }
 }
